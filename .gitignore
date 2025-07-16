@@ -8,3 +8,11 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+/.editorconfig
+.idea/commandlinetools/Symfony_16_07_2025__14_49.xml
+.idea/commandlinetools/schemas/frameworkDescriptionVersion1.1.4.xsd
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
