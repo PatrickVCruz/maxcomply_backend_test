@@ -41,6 +41,13 @@ class VehicleApiController extends AbstractController
         return $this->json($results);
     }
 
+    /**
+     * @param VehiclesRepository $vehiclesRepository
+     * @param string $vehicle
+     * @param Request $request
+     * @return Response
+     * Endpoint 3. Patch vehicle specs
+     */
     #[Route('/vehicleSpecs/{vehicle}', name: 'update_vehicle_specs', requirements: ['vehicle' => '^[a-zA-Z0-9_.-]+$'], methods: ['PATCH'])]
     public function updateVehicleSpecs(VehiclesRepository $vehiclesRepository, string $vehicle, Request $request): Response
     {
@@ -64,7 +71,7 @@ class VehicleApiController extends AbstractController
             );
         }
 
-        return $this->json($results);
+        return new JsonResponse(['Vehicle Specification updated'], Response::HTTP_OK);
     }
 
     private function checkRequestBody(array $data): ?JsonResponse

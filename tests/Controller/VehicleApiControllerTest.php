@@ -149,7 +149,7 @@ class VehicleApiControllerTest extends WebTestCase
     {
         $this->mockVehiclesRepository->expects($this->once())
             ->method('updateVehicleSpecs')
-            ->willReturn(['success' => true]);
+            ->willReturn(['Vehicle Specification updated']);
 
         $data = ['horsepower' => '100'];
         $request = new Request([], [], [], [], [], [], json_encode($data));
@@ -158,7 +158,7 @@ class VehicleApiControllerTest extends WebTestCase
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(JsonResponse::HTTP_OK, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(
-            json_encode(['success' => true]),
+            json_encode(['Vehicle Specification updated']),
             $response->getContent()
         );
     }
