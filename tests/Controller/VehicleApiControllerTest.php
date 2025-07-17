@@ -37,4 +37,30 @@ class VehicleApiControllerTest extends WebTestCase
             $response->getContent()
         );
     }
+
+    public function testGetManufacturersByVehicleTypeHandlesInvalidVehicleType(): void
+    {
+        $vehicleType = 'invalid-type';
+
+        $mockManufacturersRepository = $this->createMock(ManufacturersRepository::class);
+        $mockManufacturersRepository
+            ->expects($this->once())
+            ->method('getAllManufacturersByVehicleType')
+            ->with($vehicleType)
+            ->willReturn([]);
+
+        $client = static::createClient();
+        $container = $client->getContainer();
+        $container->set(ManufacturersRepository::class, $mockManufacturersRepository);
+
+        $client->request('GET', '/manufacturersByType/' . $vehicleType);
+
+        $response = $client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(
+            json_encode([]),
+            $response->getContent()
+        );
+    }
 }

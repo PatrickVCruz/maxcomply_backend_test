@@ -15,7 +15,7 @@ class VehicleApiController extends AbstractController
      * @return Response
      * Endpoint 1. Retrieves all manufacturers takes manufactures a specific type of vehicle
      */
-    #[Route('/manufacturersByType/{vehicleType}')]
+    #[Route('/manufacturersByType/{vehicleType}', name: 'get_manufacturers_by_vehicle_type', requirements: ['vehicle' => '^[a-zA-Z0-9_.-]*$'], methods: ['GET'])]
     public function getManufacturersByVehicleType(ManufacturersRepository $manufacturersRepository, string $vehicleType): Response
     {
         $results = $manufacturersRepository->getAllManufacturersByVehicleType($vehicleType);

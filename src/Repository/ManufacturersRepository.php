@@ -19,6 +19,15 @@ class ManufacturersRepository extends ServiceEntityRepository
 
     public function getAllManufacturersByVehicleType(string $vehicleType): array
     {
-        return ['1', 'Honda'];
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT DISTINCT m.name
+                    FROM App\Entity\Manufacturers m
+                    LEFT JOIN m.vehicles v
+                    LEFT JOIN v.vehicleType vt
+                    WHERE vt.typeName = :vehicleType'
+            )
+            ->setParameter('vehicleType', $vehicleType)
+            ->getResult(AbstractQuery::HYDRATE_ARRAY);
     }
 }
