@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Repository\ManufacturersRepository;
 use App\Repository\VehiclesRepository;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -36,5 +39,30 @@ class VehicleApiController extends AbstractController
         $results = $vehiclesRepository->getVehicleSpecs($vehicle);
 
         return $this->json($results);
+    }
+
+    #[Route('/vehicleSpecs/{vehicle}', name: 'update_vehicle_specs', requirements: ['vehicle' => '^[a-zA-Z0-9_.-]+$'], methods: ['PATCH'])]
+    public function updateVehicleSpecs(VehiclesRepository $vehiclesRepository, string $vehicle, Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $checkRequestBody = $this->checkRequestBody($data);
+        if (!is_null($checkRequestBody)) {
+            return $checkRequestBody;
+        }
+
+
+
+        return $this->json([]);
+    }
+
+    private function checkRequestBody(array $data): ?JsonResponse
+    {
+        if (!$data) {
+            return $this->json(
+                ['error' => 'Invalid or missing request body.'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+        return null;
     }
 }
