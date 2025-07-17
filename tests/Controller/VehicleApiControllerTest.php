@@ -2,12 +2,16 @@
 
 namespace App\Tests\Controller;
 
+use App\Controller\VehicleApiController;
 use App\Repository\ManufacturersRepository;
 use App\Repository\VehiclesRepository;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class VehicleApiControllerTest extends WebTestCase
@@ -17,6 +21,7 @@ class VehicleApiControllerTest extends WebTestCase
     private ContainerInterface $container;
     private MockObject $mockManufacturersRepository;
     private MockObject $mockVehiclesRepository;
+    private $mockController;
 
     protected function setUp(): void
     {
@@ -24,6 +29,7 @@ class VehicleApiControllerTest extends WebTestCase
         $this->container = $this->client->getContainer();
         $this->mockManufacturersRepository = $this->createMock(ManufacturersRepository::class);
         $this->mockVehiclesRepository = $this->createMock(VehiclesRepository::class);
+        $this->mockController = $this->container->get(VehicleApiController::class);
     }
 
     public function testGetManufacturersByVehicleTypeReturnsManufacturers(): void
@@ -138,4 +144,68 @@ class VehicleApiControllerTest extends WebTestCase
             $response->getContent()
         );
     }
+
+    public function testUpdateVehicleSpecsValid(): void
+    {
+        $this->mockVehiclesRepository->expects($this->once())
+            ->method('updateVehicleSpecs')
+            ->willReturn(['success' => true]);
+
+        $data = ['horsepower' => '100'];
+        $request = new Request([], [], [], [], [], [], json_encode($data));
+        $response = $this->mockController->updateVehicleSpecs($this->mockVehiclesRepository, 'AE86', $request);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(JsonResponse::HTTP_OK, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['success' => true]),
+            $response->getContent()
+        );
+    }
+
+    public function testUpdateVehicleSpecsInvalid(): void
+    {
+        $this->mockVehiclesRepository->expects($this->once())
+            ->method('updateVehicleSpecs')
+            ->willThrowException(new InvalidArgumentException('Field "unknown_field" is not allowed for update.'));
+
+        $data = ['horsepowers' => 'asd'];
+        $request = new Request([], [], [], [], [], [], json_encode($data));
+        $response = $this->mockController->updateVehicleSpecs($this->mockVehiclesRepository, 'vehicle-1', $request);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['error' => 'Field "unknown_field" is not allowed for update.']),
+            $response->getContent()
+        );
+    }
+
+    private function invokeCheckRequestBodyMethod(VehicleApiController $controller, array $data): ?JsonResponse
+    {
+        $reflection = new \ReflectionClass(VehicleApiController::class);
+        $method = $reflection->getMethod('checkRequestBody');
+        $method->setAccessible(true);
+        return $method->invoke($controller, $data);
+    }
+
+    public function testCheckRequestBodyReturnsErrorForEmptyData(): void
+    {
+
+        $response = $this->invokeCheckRequestBodyMethod($this->mockController, []);
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['error' => 'Invalid or missing request body.']),
+            $response->getContent()
+        );
+    }
+
+    public function testCheckRequestBodyHandlesValidData(): void
+    {
+        $response = $this->invokeCheckRequestBodyMethod(new VehicleApiController(), ['key' => 'value']);
+        $this->assertNull($response);
+    }
+
+
 }

@@ -9,6 +9,17 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'vehicle_specs')]
 class VehicleSpecs
 {
+
+    const FIELDS = [
+        'engine_type',
+        'horsepower',
+        'top_speed',
+        'price',
+        'length',
+        'width',
+        'drive_type'
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -39,13 +50,6 @@ class VehicleSpecs
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getVehicleId(): ?Vehicles

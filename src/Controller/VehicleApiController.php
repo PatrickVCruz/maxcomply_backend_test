@@ -50,9 +50,21 @@ class VehicleApiController extends AbstractController
             return $checkRequestBody;
         }
 
+        try {
+            $results = $vehiclesRepository->updateVehicleSpecs($vehicle, $data);
+        } catch (InvalidArgumentException $e) {
+            return $this->json(
+                ['error' => $e->getMessage()],
+                Response::HTTP_BAD_REQUEST
+            );
+        } catch (\Exception $e) {
+            return $this->json(
+                ['error' => $e->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
 
-
-        return $this->json([]);
+        return $this->json($results);
     }
 
     private function checkRequestBody(array $data): ?JsonResponse
