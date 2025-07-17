@@ -1,0 +1,3 @@
+id,vehicle_id,engine_type,horsepower,top_speed,price,length,width,drive_type
+1,1,Petrol,250,300,100000,4215,1625,FWD
+2,2,Petrol,50,120,50000,3610,1680,FWD
