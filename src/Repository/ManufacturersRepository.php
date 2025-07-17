@@ -21,7 +21,7 @@ class ManufacturersRepository extends ServiceEntityRepository
     {
         return $this->getEntityManager()
             ->createQuery(
-                'SELECT DISTINCT m.name
+                'SELECT DISTINCT m
                     FROM App\Entity\Manufacturers m
                     LEFT JOIN m.vehicles v
                     LEFT JOIN v.vehicleType vt
