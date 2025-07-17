@@ -16,4 +16,9 @@ class ManufacturersRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Manufacturers::class);
     }
+
+    public function getAllManufacturersByVehicleType(string $vehicleType): array
+    {
+        return ['1', 'Honda'];
+    }
 }
