@@ -16,4 +16,18 @@ class VehiclesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Vehicles::class);
     }
+
+    public function getVehicleSpecs(string $vehicle)
+    {
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT v, vs
+                     FROM App\Entity\Vehicles v
+                     LEFT JOIN v.vehicleSpecs vs
+                     WHERE v.name LIKE :vehicleName'
+            )
+            ->setParameter('vehicleName', '%' . $vehicle . '%')
+            ->getResult(AbstractQuery::HYDRATE_ARRAY);
+
+    }
 }
